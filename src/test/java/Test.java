@@ -11,7 +11,7 @@ public class Test {
         FileWriter writer = null;
         try {
             writer = new FileWriter(file,true);
-            for (int i = 0;i<3;i++) {
+            for (int i = 0;i<10;i++) {
                 String out = "fasfjhskjfhskafhsruyweiqryiuqwrndsf"+System.currentTimeMillis()+"\n\r";
                 writer.write(out);
             }
@@ -35,7 +35,7 @@ public class Test {
         FileWriter writer = null;
         try {
             writer = new FileWriter(file,true);
-            for (int i = 0;i<3;i++) {
+            for (int i = 0;i<10;i++) {
                 String out = "*&^((^*^#%&%^!%@~#$~$#$^$^"+System.currentTimeMillis()+"\n\r";
                 writer.write(out);
             }
