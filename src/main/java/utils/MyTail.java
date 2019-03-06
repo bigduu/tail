@@ -19,30 +19,22 @@ public class MyTail {
 
     private static ArrayList<String> OUTPUT = new ArrayList<>();
 
-    /**
-     * 判断文件是否有变化
-     * @return 有变化返回true 没有变化返回false
-     */
-    private static Boolean isChange() {
-        if (LIFETIME == null || LIFETIME != FILE.lastModified()) {
-            LIFETIME = FILE.lastModified();
-            return true;
-        } else {
-            return false;
-        }
-    }
+    private static Charset CHARSET;
+
+    private static Long LASTLINENUM;
+
 
     private static void outPrint() {
-        for (int i = OUTPUT.size() - 1; i > 0; i--) {
+        for (int i = OUTPUT.size() - 1; i >= 0; i--) {
             System.out.println(OUTPUT.get(i));
         }
+        OUTPUT.clear();
     }
 
     /**
      * 从后向前读
-     * @param charset 文件的字符集
      */
-    private static void read(Charset charset , Long lastLineNum) {
+    public static void read() {
 
         RandomAccessFile rf = null;
         try {
@@ -66,20 +58,20 @@ public class MyTail {
             int breakPoint = 0;
             rf.seek(pos);
             //从文件末尾开始读
-            while (pos > 0 && breakPoint < lastLineNum) {
+            while (pos > 0 && breakPoint < LASTLINENUM) {
                 c = rf.read();
                 if (c == '\n' || c == '\r') {
                     line = rf.readLine();
                     if (line != null && line.length() != 0) {
                         breakPoint++;
-                        OUTPUT.add(new String(line.getBytes(StandardCharsets.ISO_8859_1) , charset));
+                        OUTPUT.add(new String(line.getBytes(StandardCharsets.ISO_8859_1) , CHARSET));
                     }
                 }
                 pos--;
                 rf.seek(pos);
                 // 当文件指针退至文件开始处，输出第一行
                 if (pos == 0) {
-                    System.out.println(new String(rf.readLine().getBytes(StandardCharsets.ISO_8859_1) , charset));
+                    System.out.println(new String(rf.readLine().getBytes(StandardCharsets.ISO_8859_1) , CHARSET));
                 }
             }
         } catch (IOException e) {
@@ -102,25 +94,16 @@ public class MyTail {
 
     /**
      * 对文件进行监控
-     * @param option  获取java运行时的argsMpa参数
-     * @param charset 对文本的编码进行预输入
      */
-    public static void monitoring(Map<String, String> option , Charset charset) {
+    public static void init(Map<String, String> option , Charset charset) {
+        CHARSET = charset;
         String path = option.get("-f");
-        Long lastLineNum = Long.valueOf(option.get("-n"));
+        LASTLINENUM = Long.valueOf(option.get("-n"));
         File file = new File(path);
         if (file.exists()) {
             FILE = file;
         } else {
             System.out.println("文件不存在");
-            return;
         }
-        while (FILE.exists()) {
-            if (MyTail.isChange()) {
-                System.out.println("----------------------------------");
-                MyTail.read(charset , lastLineNum);
-            }
-        }
-        System.out.println("文件名已经被修改或者移动");
     }
 }
